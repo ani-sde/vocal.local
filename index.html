@@ -867,38 +867,55 @@
             });
         });
 
-        /* ------------------------------------------------
-        * JAVASCRIPT: MAP LOGIC (Leaflet Map - unchanged)
-        * ------------------------------------------------ */
+    /* ------------------------------------------------
+     * JAVASCRIPT: LEAFLET MAP (unchanged)
+     * ------------------------------------------------ */
 
-        // Check if map element exists before initializing
-        const mapElement = document.getElementById('indiaMap');
-        if (mapElement) {
-            // Initialize the map, centered roughly over India
-            const map = L.map('indiaMap').setView([22.5, 78.5], 4.5);
+    const indiaBounds = [
+      [6.5, 68.0],
+      [37.5, 97.5]
+    ];
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
+    const map = L.map('indiaMap', {
+      center: [22.9734, 78.6569],
+      zoom: 5,
+      minZoom: 4,
+      maxZoom: 8,
+      maxBounds: indiaBounds,
+      maxBoundsViscosity: 1.0,
+      attributionControl: true
+    });
 
-            // Sample Marker Data (State, Lat, Lng, Craft/Food)
-            const markersData = [
-                { lat: 21.1702, lng: 72.8311, info: "Surat, Gujarat: Diamond Hub" },
-                { lat: 18.5204, lng: 73.8567, info: "Pune, Maharashtra: Kolhapuri Chappal" },
-                { lat: 25.3176, lng: 82.9739, info: "Varanasi, UP: Banarasi Sarees" },
-                { lat: 26.9124, lng: 75.7873, info: "Jaipur, Rajasthan: Blue Pottery" },
-                { lat: 12.9716, lng: 77.5946, info: "Bangalore, Karnataka: Channapatna Toys (near)" },
-                { lat: 25.5941, lng: 85.1376, info: "Patna, Bihar: Madhubani Art (near)" },
-                { lat: 22.5726, lng: 88.3639, info: "Kolkata, West Bengal: Rosogolla / Terracotta" }
-            ];
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 10,
+      minZoom: 4,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-            // Add Markers to the map
-            markersData.forEach(data => {
-                L.marker([data.lat, data.lng])
-                    .addTo(map)
-                    .bindPopup(`<b>${data.info}</b>`);
-            });
-        }
+    const statesData = [
+      { name: "Maharashtra", coords: [19.7515, 75.7139], info: "Kolhapuri Chappals & Warli Art" },
+      { name: "Uttar Pradesh", coords: [26.8467, 80.9462], info: "Banarasi Sarees & Brass Work" },
+      { name: "Karnataka", coords: [15.3173, 75.7139], info: "Channapatna Toys & Sandalwood Crafts" },
+      { name: "Bihar", coords: [25.0961, 85.3131], info: "Madhubani Paintings" },
+      { name: "Rajasthan", coords: [27.0238, 74.2179], info: "Blue Pottery & Block Printing" },
+      { name: "Tamil Nadu", coords: [11.1271, 78.6569], info: "Tanjore Paintings & Silk Sarees" },
+	  { name: "Kolkata", coords:[22.5726, 88.3639], info: "Kolkata, West Bengal: Rosogolla / Terracotta" },
+	  { name: "Gujrat",coords:[ 21.1702,72.8311], info: "Surat, Gujarat: Diamond Hub"}
+	  
+    ];
+
+    statesData.forEach(state => {
+      const marker = L.marker(state.coords).addTo(map);
+      marker.bindPopup(`<strong>${state.name}</strong><br>${state.info}`);
+      L.circle(state.coords, {
+        color: '#f59e0b',
+        fillColor: '#fbbf24',
+        fillOpacity: 0.18,
+        radius: 35000
+      }).addTo(map);
+    });
+
+    document.getElementById('indiaMap').setAttribute('tabindex', '0');
     </script>
 
 </body>
