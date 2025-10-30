@@ -1,925 +1,905 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vocal for Local — Fun Learning</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Vocal for Local — Fun Learning</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-  <style>
-    /* Small custom tweaks for snappy animations and amber glow */
-    :root { --accent: #f59e0b; } /* amber-500 */
-    .card-transition { transition: transform .12s ease, box-shadow .12s ease; }
-    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 12px 36px rgba(0,0,0,0.4); } /* Slightly larger shadow */
-    .btn-glow:hover { box-shadow: 0 8px 30px rgba(245,158,11,0.25), 0 0 18px rgba(245,158,11,0.1); transform: translateY(-2px); } /* Stronger glow */
-    .fade-in { animation: fadeIn .18s ease both; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+    <style>
+        /* Small custom tweaks for snappy animations and amber glow */
+        :root { --accent: #f59e0b; } /* amber-500 */
+        .card-transition { transition: transform .12s ease, box-shadow .12s ease; }
+        .card-hover:hover { transform: translateY(-6px); box-shadow: 0 12px 36px rgba(0,0,0,0.4); } /* Slightly larger shadow */
+        .btn-glow:hover { box-shadow: 0 8px 30px rgba(245,158,11,0.25), 0 0 18px rgba(245,158,11,0.1); transform: translateY(-2px); } /* Stronger glow */
+        .fade-in { animation: fadeIn .18s ease both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
 
-    /* Custom style for the hamburger icon */
-    .hamburger { cursor: pointer; display: flex; flex-direction: column; justify-content: space-around; width: 24px; height: 24px; }
-    .hamburger div { width: 100%; height: 2px; background-color: var(--accent); border-radius: 10px; transition: all 0.2s linear; }
-    .toggle .line1 { transform: rotate(-45deg) translate(-5px, 6px); }
-    .toggle .line2 { opacity: 0; }
-    .toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
+        /* Custom style for the hamburger icon */
+        .hamburger { cursor: pointer; display: flex; flex-direction: column; justify-content: space-around; width: 24px; height: 24px; }
+        .hamburger div { width: 100%; height: 2px; background-color: var(--accent); border-radius: 10px; transition: all 0.2s linear; }
+        .toggle .line1 { transform: rotate(-45deg) translate(-5px, 6px); }
+        .toggle .line2 { opacity: 0; }
+        .toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
 
-    /* Custom style to hide the number input spin buttons (scroll/up/down arrows) */
-    /* For Chrome, Safari, Edge, Opera */
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    /* For Firefox */
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
+        /* Custom style to hide the number input spin buttons (scroll/up/down arrows) */
+        /* For Chrome, Safari, Edge, Opera */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* For Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
 
-    /* Style for the radio buttons in the new quiz */
-    .option-label.selected {
-        border: 1px solid #f59e0b; /* Amber border when selected */
-        background-color: rgba(245, 158, 11, 0.1); /* Light amber background */
-    }
-  </style>
+        /* Style for the radio buttons in the new quiz */
+        .option-label.selected {
+            border: 1px solid #f59e0b; /* Amber border when selected */
+            background-color: rgba(245, 158, 11, 0.1); /* Light amber background */
+        }
+        
+        /* --- NEW CSS FOR BACKGROUND IMAGE --- */
+        #hero-background {
+            /* Replace 'YOUR_BACKGROUND_IMAGE_URL' with an actual high-resolution image link */
+            background-image: url('back1.jpg'); 
+            background-size: cover;
+            background-position: center 30%; /* Adjust to keep the main focus visible */
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Adds depth below the header area */
+        }
+
+        /* Adds a dark overlay for text readability */
+        #hero-background::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.45); /* Darker overlay for better text contrast */
+        }
+    </style>
 </head>
 <body class="bg-slate-800 text-slate-100 font-inter antialiased">
 
-  <div class="max-w-6xl mx-auto p-6">
+    <div id="hero-background">
+        <div class="max-w-6xl mx-auto p-6 relative z-10">
+        
+            <header class="flex items-center justify-between gap-4 mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-400 text-slate-900 font-bold shadow-md">
+                        VfL
+                    </div>
 
-    <header class="flex items-center justify-between gap-4 mb-8">
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-400 text-slate-900 font-bold shadow-md">
-          VfL
+                    <svg class="w-10 h-10 text-amber-500" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="4" stroke-opacity="0.3" />
+                        <path d="M50 5 L50 95 M5 50 L95 50" stroke="currentColor" stroke-width="2" />
+                        <path d="M50 5 A45 45 0 0 1 95 50 A45 45 0 0 1 50 95 A45 45 0 0 1 5 50 A45 45 0 0 1 50 5" 
+                            stroke="currentColor" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round" />
+                        <circle cx="50" cy="50" r="8" fill="currentColor" />
+                    </svg>
+
+                    <div>
+                        <h1 class="text-2xl font-semibold">Vocal for Local</h1>
+                        <p class="text-sm text-amber-200/70">Fun learning about India's heritage — for India's youth</p>
+                    </div>
+                </div>
+
+                <nav class="hidden md:flex gap-4" aria-label="Main Navigation">
+                    <a href="#initiative" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">About</a>
+                    <a href="#gallery" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Gallery</a> 
+                    <a href="#products" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Products</a>
+                    <a href="#puzzle" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Puzzle Zone</a>
+                    <a href="#trivia" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Trivia</a>
+                    <a href="#state-quiz" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">State Quiz</a>
+                    <a href="#map" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Map</a>
+                </nav>
+
+                <button id="menuBtn" class="md:hidden p-2" aria-label="Open mobile menu" aria-expanded="false">
+                    <div class="hamburger">
+                        <div class="line1"></div>
+                        <div class="line2"></div>
+                        <div class="line3"></div>
+                    </div>
+                </button>
+
+            </header>
+
+            <nav id="mobileMenu" class="md:hidden absolute top-20 left-6 right-6 bg-slate-700/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl z-20 hidden" aria-label="Mobile Navigation">
+                <div class="flex flex-col gap-2">
+                    <a href="#initiative" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">About</a>
+                    <a href="#gallery" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Gallery</a> 
+                    <a href="#products" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Products</a>
+                    <a href="#puzzle" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Puzzle Zone</a>
+                    <a href="#trivia" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Trivia</a>
+                    <a href="#state-quiz" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">State Quiz</a>
+                    <a href="#map" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Map</a>
+                </div>
+            </nav>
+
+            <section id="initiative" class="bg-slate-900/40 rounded-2xl p-6 mb-8 shadow-xl fade-in backdrop-blur-sm border border-slate-700">
+                <div class="md:flex md:items-center md:justify-between gap-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-amber-100">Explore India's Crafts, food, culture & heritage</h2>
+                        <p class="mt-2 text-slate-200/90">Interactive quizzes, a discoverable map of artisans and simple games that make learning heritage delightful.
+                            Today’s youth are more aware of global brands and trends than the rich traditions of their own region. Local crafts, foods, and cultural
+                            practices are slowly being forgotten. This lack of awareness also affects local artisans and small businesses who depend on cultural products
+                            for their livelihood. There is a need for an engaging and educational platform that reconnects young people with India’s local heritage.</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex-shrink-0">
+                        <button id="startBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-xl btn-glow transition shadow-lg">Start Puzzle</button>
+                    </div>
+                </div>
+            </section>
         </div>
-
-        <svg class="w-10 h-10 text-amber-500" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="4" stroke-opacity="0.3" />
-          <path d="M50 5 L50 95 M5 50 L95 50" stroke="currentColor" stroke-width="2" />
-          <path d="M50 5 A45 45 0 0 1 95 50 A45 45 0 0 1 50 95 A45 45 0 0 1 5 50 A45 45 0 0 1 50 5" 
-                stroke="currentColor" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round" />
-          <circle cx="50" cy="50" r="8" fill="currentColor" />
-        </svg>
-
-        <div>
-          <h1 class="text-2xl font-semibold">Vocal for Local</h1>
-          <p class="text-sm text-amber-200/70">Fun learning about India's heritage — for India's youth</p>
-        </div>
-      </div>
-
-      <nav class="hidden md:flex gap-4" aria-label="Main Navigation">
-        <a href="#initiative" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">About</a>
-        <a href="#products" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Products</a>
-        <a href="#puzzle" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Puzzle Zone</a>
-        <a href="#trivia" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Trivia</a>
-        <a href="#state-quiz" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">State Quiz</a>
-        <a href="#map" class="text-sm px-3 py-2 rounded-md hover:bg-slate-700/50 transition">Map</a>
-      </nav>
-
-      <button id="menuBtn" class="md:hidden p-2" aria-label="Open mobile menu" aria-expanded="false">
-        <div class="hamburger">
-          <div class="line1"></div>
-          <div class="line2"></div>
-          <div class="line3"></div>
-        </div>
-      </button>
-
-    </header>
-
-    <nav id="mobileMenu" class="md:hidden absolute top-20 left-6 right-6 bg-slate-700/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl z-10 hidden" aria-label="Mobile Navigation">
-        <div class="flex flex-col gap-2">
-            <a href="#initiative" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">About</a>
-            <a href="#products" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Products</a>
-            <a href="#puzzle" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Puzzle Zone</a>
-            <a href="#trivia" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Trivia</a>
-            <a href="#state-quiz" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">State Quiz</a>
-            <a href="#map" class="block px-3 py-2 rounded-lg hover:bg-slate-600/50 text-base font-medium">Map</a>
-        </div>
-    </nav>
-
-    <section class="bg-slate-700/60 rounded-2xl p-6 mb-8 shadow-xl fade-in">
-      <div class="md:flex md:items-center md:justify-between gap-6">
-        <div>
-          <h2 class="text-3xl font-bold">Explore India's Crafts, food, culture & heritage</h2>
-          <p class="mt-2 text-slate-200/80">Interactive quizzes, a discoverable map of artisans and simple games that make learning heritage delightful.
-            Today’s youth are more aware of global brands and trends than the rich traditions of their own region. Local crafts, foods, and cultural
-            practices are slowly being forgotten. This lack of awareness also affects local artisans and small businesses who depend on cultural products
-            for their livelihood. There is a need for an engaging and educational platform that reconnects young people with India’s local heritage.</p>
-        </div>
-        <div class="mt-4 md:mt-0">
-          <button id="startBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-xl btn-glow transition shadow-lg">Start Puzzle</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="products" class="mb-8 fade-in">
-      <h2 class="text-3xl font-bold mb-5">Our Learning Products</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="bg-slate-700/40 rounded-xl p-5 card-transition card-hover shadow-lg">
-          <h3 class="text-xl font-semibold text-amber-300">Kolhapuri Chappal</h3>
-          <p class="mt-2 text-slate-300">Handmade leather footwear from **Maharashtra**. Famous for durability and traditional design. </p>
-        </div>
-        <div class="bg-slate-700/40 rounded-xl p-5 card-transition card-hover shadow-lg">
-          <h3 class="text-xl font-semibold text-amber-300">Banarasi Saree</h3>
-          <p class="mt-2 text-slate-300">Intricately woven silk sarees with **zari** (gold/silver thread) from **Varanasi** (UP). </p>
-        </div>
-        <div class="bg-slate-700/40 rounded-xl p-5 card-transition card-hover shadow-lg">
-          <h3 class="text-xl font-semibold text-amber-300">Channapatna Toys</h3>
-          <p class="mt-2 text-slate-300">Eco-friendly wooden toys with natural dyes, often called the 'Toy Town of **Karnataka**'. </p>
-        </div>
-      </div>
-    </section>
-
-    <section id="puzzle" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-2xl font-semibold">Puzzle Zone — Match the Food with its State</h3>
-        <div class="text-sm text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full">Total Items: <span id="totalItems">5</span></div>
-      </div>
-      <p class="text-slate-300 text-sm mb-4">
-        Enter the number (1 to 5) corresponding to the food that matches the state.
-      </p>
-
-      <div id="puzzleArea">
-        </div>
-
-      <div id="feedbackBox" role="alert" class="mt-4 hidden rounded-lg px-4 py-3 text-sm font-medium"></div>
-
-      <div class="flex items-center gap-3 mt-5">
-        <button id="checkBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-4 py-2 rounded-lg btn-glow transition">✅ Check Answers</button>
-        <button id="nextBtn" class="bg-transparent border border-amber-500 hover:bg-amber-500/10 text-amber-300 px-4 py-2 rounded-lg transition hidden">➡️ Next Round</button>
-        <button id="resetBtn" class="bg-transparent border border-slate-500 hover:bg-slate-600/10 text-slate-300 px-4 py-2 rounded-lg transition">🔁 Play Again</button>
-        <div class="ml-auto text-sm"><span class="text-slate-300">Score:</span> <span id="scoreBadge" class="ml-2 font-bold text-lg text-amber-300">0</span></div>
-      </div>
-    </section>
+    </div>
+	
+    <div class="max-w-6xl mx-auto p-6">
     
-    <section id="state-quiz" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
-        <h3 class="text-2xl font-semibold mb-4">State Spotlight Quiz — Test Your Knowledge</h3>
-        <p id="quizProgress" class="text-slate-300 text-sm mb-6">Question 1 of 10. Select the correct option below.</p>
+        <section id="gallery" class="mb-8 fade-in">
+            <h2 class="text-3xl font-bold mb-5">📸 Heritage Image Gallery</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                
+                <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer card-transition card-hover">
+                    <img src="gal1.jpg" alt="Madhubani Painting from Bihar" class="w-full h-full object-cover aspect-[3/2] transition duration-300 group-hover:scale-105" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-end">
+                        <p class="text-white text-sm font-medium leading-snug">Madhubani Painting</p>
+                    </div>
+                </div>
 
-        <div id="quizContainer">
+                <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer card-transition card-hover">
+                    <img src="gal2.webp" alt="Banarasi Saree" class="w-full h-full object-cover aspect-[3/2] transition duration-300 group-hover:scale-105" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-end">
+                        <p class="text-white text-sm font-medium leading-snug">Banarasi Zari Work</p>
+                    </div>
+                </div>
+
+                <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer card-transition card-hover">
+                    <img src="gal3.webp" alt="Kolhapuri Chappal" class="w-full h-full object-cover aspect-[3/2] transition duration-300 group-hover:scale-105" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-end">
+                        <p class="text-white text-sm font-medium leading-snug">Kolhapuri Chappal</p>
+                    </div>
+                </div>
+
+                <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer card-transition card-hover">
+                    <img src="gal4.webp" alt="Channapatna Wooden Toys" class="w-full h-full object-cover aspect-[3/2] transition duration-300 group-hover:scale-105" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-end">
+                        <p class="text-white text-sm font-medium leading-snug">Channapatna Toys</p>
+                    </div>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer card-transition card-hover">
+                    <img src="gal51.jpg" alt="Indian Chai" class="w-full h-full object-cover aspect-[3/2] transition duration-300 group-hover:scale-105" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-end">
+                        <p class="text-white text-sm font-medium leading-snug">Indian Chai</p>
+                    </div>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer card-transition card-hover">
+                    <img src="gal6.webp" alt="Blue Pottery of Jaipur" class="w-full h-full object-cover aspect-[3/2] transition duration-300 group-hover:scale-105" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-end">
+                        <p class="text-white text-sm font-medium leading-snug">Jaipur Blue Pottery</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="products" class="mb-8 fade-in">
+            <h2 class="text-3xl font-bold mb-5">Our Learning Products</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-slate-700/40 rounded-xl p-5 card-transition card-hover shadow-lg">
+                    <h3 class="text-xl font-semibold text-amber-300">Kolhapuri Chappal</h3>
+                    <p class="mt-2 text-slate-300">Handmade leather footwear from **Maharashtra**. Famous for durability and traditional design. </p>
+                </div>
+                <div class="bg-slate-700/40 rounded-xl p-5 card-transition card-hover shadow-lg">
+                    <h3 class="text-xl font-semibold text-amber-300">Banarasi Saree</h3>
+                    <p class="mt-2 text-slate-300">Intricately woven silk sarees with **zari** (gold/silver thread) from **Varanasi** (UP). </p>
+                </div>
+                <div class="bg-slate-700/40 rounded-xl p-5 card-transition card-hover shadow-lg">
+                    <h3 class="text-xl font-semibold text-amber-300">Channapatna Toys</h3>
+                    <p class="mt-2 text-slate-300">Eco-friendly wooden toys with natural dyes, often called the 'Toy Town of **Karnataka**'. </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="puzzle" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-2xl font-semibold">Puzzle Zone — Match the Food with its State</h3>
+                <div class="text-sm text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full">Total Items: <span id="totalItems">5</span></div>
+            </div>
+            <p class="text-slate-300 text-sm mb-4">
+                Enter the number (1 to 5) corresponding to the food that matches the state.
+            </p>
+
+            <div id="puzzleArea">
             </div>
 
-        <div id="quizFeedback" role="alert" class="mt-6 hidden rounded-lg px-4 py-3 text-sm font-medium"></div>
+            <div id="feedbackBox" role="alert" class="mt-4 hidden rounded-lg px-4 py-3 text-sm font-medium"></div>
 
-        <div class="flex flex-wrap items-center gap-3 mt-5">
-            <button id="nextQuestionBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-4 py-2 rounded-lg btn-glow transition">Next Question</button>
-            <button id="submitQuizBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg btn-glow transition hidden">Submit Quiz</button>
-            <button id="restartQuizBtn" class="bg-transparent border border-slate-500 hover:bg-slate-600/10 text-slate-300 px-4 py-2 rounded-lg transition">Restart Quiz</button>
-            <div class="ml-auto text-sm"><span class="text-slate-300">Quiz Score:</span> <span id="quizScoreBadge" class="ml-2 font-bold text-lg text-green-400">0 / 10</span></div>
-        </div>
-    </section>
+            <div class="flex items-center gap-3 mt-5">
+                <button id="checkBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-4 py-2 rounded-lg btn-glow transition">✅ Check Answers</button>
+                <button id="nextBtn" class="bg-transparent border border-amber-500 hover:bg-amber-500/10 text-amber-300 px-4 py-2 rounded-lg transition hidden">➡️ Next Round</button>
+                <button id="resetBtn" class="bg-transparent border border-slate-500 hover:bg-slate-600/10 text-slate-300 px-4 py-2 rounded-lg transition">🔁 Play Again</button>
+                <div class="ml-auto text-sm"><span class="text-slate-300">Score:</span> <span id="scoreBadge" class="ml-2 font-bold text-lg text-amber-300">0</span></div>
+            </div>
+        </section>
+        
+        <section id="state-quiz" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
+            <h3 class="text-2xl font-semibold mb-4">State Spotlight Quiz — Test Your Knowledge</h3>
+            <p id="quizProgress" class="text-slate-300 text-sm mb-6">Question 1 of 10. Select the correct option below.</p>
+
+            <div id="quizContainer">
+                </div>
+
+            <div id="quizFeedback" role="alert" class="mt-6 hidden rounded-lg px-4 py-3 text-sm font-medium"></div>
+
+            <div class="flex flex-wrap items-center gap-3 mt-5">
+                <button id="nextQuestionBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-4 py-2 rounded-lg btn-glow transition">Next Question</button>
+                <button id="submitQuizBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg btn-glow transition hidden">Submit Quiz</button>
+                <button id="restartQuizBtn" class="bg-transparent border border-slate-500 hover:bg-slate-600/10 text-slate-300 px-4 py-2 rounded-lg transition">Restart Quiz</button>
+                <div class="ml-auto text-sm"><span class="text-slate-300">Quiz Score:</span> <span id="quizScoreBadge" class="ml-2 font-bold text-lg text-green-400">0 / 10</span></div>
+            </div>
+        </section>
 
 
-    <section id="trivia" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
-        <h3 class="text-2xl font-semibold mb-4">Group Trivia Challenge</h3>
-        <p class="text-slate-300 text-sm mb-6">Teams score {+10} for a correct answer and {-5} for a wrong answer. Click "New Question" to start.</p>
+        <section id="trivia" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
+            <h3 class="text-2xl font-semibold mb-4">Group Trivia Challenge</h3>
+            <p class="text-slate-300 text-sm mb-6">Teams score {+10} for a correct answer and {-5} for a wrong answer. Click "New Question" to start.</p>
 
-        <div id="triviaScoreboard" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            
-            <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
-                <span class="text-sm font-medium text-amber-300 block">Group A</span>
-                <span id="scoreA" class="text-3xl font-bold text-slate-300 my-2">0</span>
-                <div class="scoring-controls-mini flex gap-2">
-                    <button data-group="A" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
-                    <button data-group="A" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
+            <div id="triviaScoreboard" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                
+                <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
+                    <span class="text-sm font-medium text-amber-300 block">Group A</span>
+                    <span id="scoreA" class="text-3xl font-bold text-slate-300 my-2">0</span>
+                    <div class="scoring-controls-mini flex gap-2">
+                        <button data-group="A" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
+                        <button data-group="A" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
+                    </div>
+                </div>
+
+                <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
+                    <span class="text-sm font-medium text-amber-300 block">Group B</span>
+                    <span id="scoreB" class="text-3xl font-bold text-slate-300 my-2">0</span>
+                    <div class="scoring-controls-mini flex gap-2">
+                        <button data-group="B" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
+                        <button data-group="B" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
+                    </div>
+                </div>
+
+                <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
+                    <span class="text-sm font-medium text-amber-300 block">Group C</span>
+                    <span id="scoreC" class="text-3xl font-bold text-slate-300 my-2">0</span>
+                    <div class="scoring-controls-mini flex gap-2">
+                        <button data-group="C" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
+                        <button data-group="C" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
+                    </div>
+                </div>
+
+                <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
+                    <span class="text-sm font-medium text-amber-300 block">Group D</span>
+                    <span id="scoreD" class="text-3xl font-bold text-slate-300 my-2">0</span>
+                    <div class="scoring-controls-mini flex gap-2">
+                        <button data-group="D" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
+                        <button data-group="D" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
-                <span class="text-sm font-medium text-amber-300 block">Group B</span>
-                <span id="scoreB" class="text-3xl font-bold text-slate-300 my-2">0</span>
-                <div class="scoring-controls-mini flex gap-2">
-                    <button data-group="B" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
-                    <button data-group="B" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
+            <div class="bg-slate-700/80 p-5 rounded-xl shadow-lg border border-slate-600">
+                <h4 class="text-lg font-semibold text-slate-200 mb-3">Current Question:</h4>
+                <p id="triviaQuestionText" class="text-xl font-light italic text-slate-300">Press 'New Question' to begin the trivia challenge.</p>
+                <div id="triviaAnswerBox" class="text-sm mt-3 hidden bg-amber-900/40 p-3 rounded-md border border-amber-700 text-amber-200">
+                    <strong class="font-semibold">Answer:</strong> <span id="triviaAnswer"></span>
                 </div>
             </div>
 
-            <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
-                <span class="text-sm font-medium text-amber-300 block">Group C</span>
-                <span id="scoreC" class="text-3xl font-bold text-slate-300 my-2">0</span>
-                <div class="scoring-controls-mini flex gap-2">
-                    <button data-group="C" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
-                    <button data-group="C" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
-                </div>
+            <div class="flex flex-wrap items-center gap-3 mt-6">
+                <button id="newQuestionBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-4 py-2 rounded-lg btn-glow transition">🆕 New Question</button>
+                <button id="showAnswerBtn" class="bg-slate-600 hover:bg-slate-500 text-slate-100 px-4 py-2 rounded-lg transition hidden">Reveal Answer</button>
+                <button id="resetTriviaBtn" class="bg-transparent border border-slate-500 hover:bg-slate-600/10 text-slate-300 px-4 py-2 rounded-lg transition ml-auto">Reset Scores</button>
             </div>
+        </section>
 
-            <div class="group-box bg-slate-700 p-3 rounded-lg text-center flex flex-col items-center">
-                <span class="text-sm font-medium text-amber-300 block">Group D</span>
-                <span id="scoreD" class="text-3xl font-bold text-slate-300 my-2">0</span>
-                <div class="scoring-controls-mini flex gap-2">
-                    <button data-group="D" data-points="10" class="score-btn bg-green-700 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transition hidden">+10</button>
-                    <button data-group="D" data-points="-5" class="score-btn bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition hidden">-5</button>
-                </div>
-            </div>
-        </div>
+        <section id="map" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
+            <h3 class="text-2xl font-semibold mb-2">Explore India's Heritage Map</h3>
+            <p class="text-slate-300 text-sm mb-4">Click on markers to read about local crafts and specialties.</p>
+            <div id="indiaMap" class="w-full h-96 rounded-lg border border-slate-600 shadow-inner"></div>
+        </section>
 
-        <div class="bg-slate-700/80 p-5 rounded-xl shadow-lg border border-slate-600">
-            <h4 class="text-lg font-semibold text-slate-200 mb-3">Current Question:</h4>
-            <p id="triviaQuestionText" class="text-xl font-light italic text-slate-300">Press 'New Question' to begin the trivia challenge.</p>
-            <div id="triviaAnswerBox" class="text-sm mt-3 hidden bg-amber-900/40 p-3 rounded-md border border-amber-700 text-amber-200">
-                <strong class="font-semibold">Answer:</strong> <span id="triviaAnswer"></span>
-            </div>
-        </div>
+        <footer class="text-center text-slate-400 text-sm mt-6">
+            © 2025 Vocal for Local — Crafted with care in India by team Class 9B KV Karwar
+        </footer>
 
-        <div class="flex flex-wrap items-center gap-3 mt-6">
-            <button id="newQuestionBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-4 py-2 rounded-lg btn-glow transition">🆕 New Question</button>
-            <button id="showAnswerBtn" class="bg-slate-600 hover:bg-slate-500 text-slate-100 px-4 py-2 rounded-lg transition hidden">Reveal Answer</button>
-            <button id="resetTriviaBtn" class="bg-transparent border border-slate-500 hover:bg-slate-600/10 text-slate-300 px-4 py-2 rounded-lg transition ml-auto">Reset Scores</button>
-        </div>
-    </section>
+    </div>
 
-    <section id="map" class="bg-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl fade-in">
-      <h3 class="text-2xl font-semibold mb-2">Explore India's Heritage Map</h3>
-      <p class="text-slate-300 text-sm mb-4">Click on markers to read about local crafts and specialties.</p>
-      <div id="indiaMap" class="w-full h-96 rounded-lg border border-slate-600 shadow-inner"></div>
-    </section>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <footer class="text-center text-slate-400 text-sm mt-6">
-      © 2025 Vocal for Local — Crafted with care in India by team Class 9B KV Karwar
-    </footer>
+    <script>
+        /* ------------------------------------------------
+        * JAVASCRIPT: COMMON ELEMENTS & EVENT HANDLERS
+        * ------------------------------------------------ */
 
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <script>
-    /* ------------------------------------------------
-     * JAVASCRIPT: COMMON ELEMENTS & EVENT HANDLERS
-     * ------------------------------------------------ */
-
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const startBtn = document.getElementById('startBtn');
-    
-    // Mobile Menu Toggle Function
-    function toggleMobileMenu() {
-        mobileMenu.classList.toggle('hidden');
-        menuBtn.classList.toggle('toggle');
-        const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true' || false;
-        menuBtn.setAttribute('aria-expanded', !isExpanded);
-    }
-    
-    // Global Event listeners
-    menuBtn.addEventListener('click', toggleMobileMenu);
-    
-    // Close mobile menu when a link is clicked
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', toggleMobileMenu);
-    });
-
-    startBtn.addEventListener('click', () => { 
-        window.location.href = '#puzzle';
-        if(!mobileMenu.classList.contains('hidden')) {
-             toggleMobileMenu();
-        }
-    });
-
-    /* ------------------------------------------------
-     * JAVASCRIPT: PUZZLE LOGIC (Matching Quiz - unchanged)
-     * ------------------------------------------------ */
-
-    const puzzleRounds = [
-      [
-        { food: 'Dhokla', state: 'Gujarat', fact: 'Dhokla is a steamed, spongy snack from Gujarat, often enjoyed with spicy chutneys.' },
-        { food: 'Idli', state: 'Tamil Nadu', fact: 'Idli is a soft breakfast delight from Tamil Nadu, typically made from fermented rice and lentil batter.' },
-        { food: 'Litti Chokha', state: 'Bihar', fact: 'Litti Chokha is a roasted delicacy from Bihar, where litti is baked wheat dough and chokha is a vegetable mash.' },
-        { food: 'Fish Curry', state: 'West Bengal', fact: 'Fish Curry (Machher Jhol) is a coastal favorite from West Bengal, famous for its light, flavorful mustard-based gravy.' },
-        { food: 'Rogan Josh', state: 'Jammu & Kashmir', fact: 'Rogan Josh is a spicy lamb dish from Jammu & Kashmir, one of the signature dishes of Kashmiri Wazwan cuisine.' }
-      ],
-      [
-        { food: 'Dal Baati Churma', state: 'Rajasthan', fact: 'Dal Baati Churma is a rich dish from Rajasthan. The baatis are hard, unleavened wheat balls traditionally baked in a fire.' },
-        { food: 'Poha', state: 'Madhya Pradesh', fact: 'Poha (flattened rice) is a light, healthy breakfast dish from Madhya Pradesh, often garnished with Sev and coriander.' },
-        { food: 'Biryani', state: 'Telangana', fact: 'The Hyderabad style of Biryani from Telangana is world-famous for its distinct "Kaccha Gosht" or dum cooking method.' },
-        { food: 'Sarson da Saag', state: 'Punjab', fact: 'Sarson da Saag is a winter delicacy from Punjab, made from mustard greens and best paired with Makki di Roti.' },
-        { food: 'Bamboo Shoot Curry', state: 'Nagaland', fact: 'Bamboo Shoot Curry is a tangy dish from Nagaland, central to Naga cuisine, offering a unique fermented flavor.' }
-      ],
-    ];
-
-    let currentRound = 0;
-    let totalScore = 0;
-
-    const puzzleArea = document.getElementById('puzzleArea');
-    const checkBtn = document.getElementById('checkBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const scoreBadge = document.getElementById('scoreBadge');
-    const feedbackBox = document.getElementById('feedbackBox');
-    const totalItemsBadge = document.getElementById('totalItems');
-
-    function renderPuzzleRound() {
-      const round = puzzleRounds[currentRound];
-      if (!round) {
-          puzzleArea.innerHTML = `<div class="text-center py-10"><h3 class="text-3xl font-bold text-amber-400">🎉 No more rounds!</h3><p class="mt-3 text-xl text-slate-300">Your Final Score: <strong class="text-amber-300">${totalScore}</strong> / ${puzzleRounds.length * 5}</p></div>`;
-          nextBtn.classList.add('hidden');
-          checkBtn.disabled = true;
-          return;
-      }
-      
-      puzzleArea.innerHTML = '';
-      totalItemsBadge.textContent = round.length; 
-
-      // Food Names list (Single Horizontal Row)
-      const foodList = document.createElement('div');
-      foodList.className = 'flex justify-around items-stretch gap-1 p-3 bg-slate-700 rounded-lg shadow-inner';
-      
-      round.forEach((item, idx) => {
-        const foodItem = document.createElement('div');
-        foodItem.className = 'w-1/5 flex flex-col justify-center items-center text-center px-1 py-1'; 
-        foodItem.innerHTML = `
-          <div class="font-bold text-lg text-amber-200">${idx+1}</div>
-          <div class="text-xs sm:text-sm text-slate-200 leading-tight">${item.food}</div>
-        `;
-        foodList.appendChild(foodItem);
-      });
-      
-      const foodHeader = document.createElement('h4');
-      foodHeader.textContent = 'Foods:';
-      foodHeader.className = 'text-lg font-medium text-slate-100 mb-2 mt-2';
-      puzzleArea.appendChild(foodHeader);
-
-      puzzleArea.appendChild(foodList);
-
-
-      // State inputs (Vertical) - Randomize the order of states for the puzzle
-      const states = round.map(i => i.state).sort(() => Math.random() - 0.5);
-      const list = document.createElement('div');
-      list.className = 'mt-4 space-y-3';
-      
-      states.forEach((state, i) => {
-        const wrap = document.createElement('div');
-        wrap.className = 'flex flex-col state-wrapper'; 
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const startBtn = document.getElementById('startBtn');
         
-        const label = document.createElement('label');
-        label.className = 'state-label flex items-center justify-between bg-slate-700/70 hover:bg-slate-700 px-3 py-2 rounded-md transition'; 
-        label.innerHTML = `
-          <span class="font-medium">${state}</span>
-          <input type="number" min="1" max="${round.length}" id="ans${i}" data-state="${state}" inputmode="numeric" aria-label="Enter number for ${state}"
-          class="w-12 text-center rounded-md bg-slate-800/80 border border-amber-500 text-amber-300 focus:border-amber-400 px-1 py-1 transition focus:outline-none focus:ring-1 focus:ring-amber-400">
-        `;
-        wrap.appendChild(label);
-        list.appendChild(wrap);
-      });
-      puzzleArea.appendChild(list);
-
-      // reset controls states
-      nextBtn.classList.add('hidden');
-      checkBtn.disabled = false;
-
-      // clear feedback
-      feedbackBox.classList.add('hidden');
-      feedbackBox.textContent = '';
-    }
-
-    function checkRound() {
-      const round = puzzleRounds[currentRound];
-      const stateWrappers = puzzleArea.querySelectorAll('.state-wrapper'); 
-      let correctCount = 0;
-      let allCorrect = true; 
-
-      stateWrappers.forEach(wrap => {
-        // Find existing elements
-        const label = wrap.querySelector('.state-label');
-        const input = wrap.querySelector('input[type="number"]');
-        let factElement = wrap.querySelector('.fact-box');
-        
-        if (factElement) {
-            wrap.removeChild(factElement);
-            label.classList.remove('rounded-t-md');
-            label.classList.add('rounded-md');
-            factElement = null;
-        }
-
-        input.classList.remove('border-green-400', 'border-red-400', 'border-amber-500', 'border-slate-500'); 
-        const state = input.dataset.state; 
-        const ansIndex = parseInt(input.value, 10) - 1; 
-        
-        let isCorrect = false;
-        let foodItem = null; 
-
-        if (!isNaN(ansIndex) && ansIndex >= 0 && ansIndex < round.length) {
-          const picked = round[ansIndex];
-          if (picked && picked.state === state) {
-            correctCount++;
-            isCorrect = true;
-            foodItem = picked;
-          }
+        // Mobile Menu Toggle Function
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('hidden');
+            menuBtn.classList.toggle('toggle');
+            const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true' || false;
+            menuBtn.setAttribute('aria-expanded', !isExpanded);
         }
         
-        // Add visual feedback to input boxes
-        if (input.value === "" || isNaN(ansIndex) || ansIndex < 0 || ansIndex >= round.length) {
-            input.classList.add('border-slate-500'); 
-            allCorrect = false;
-        } else if (isCorrect) {
-            input.classList.add('border-green-400');
-        } else {
-            input.classList.add('border-red-400');
-            allCorrect = false;
-        }
-
-        if (isCorrect && foodItem && foodItem.fact) {
-            factElement = document.createElement('div');
-            factElement.className = 'fact-box bg-slate-600/50 text-slate-300 text-xs italic px-3 py-2 rounded-b-md -mt-1 fade-in';
-            factElement.textContent = `💡 Fact: ${foodItem.fact}`;
-            wrap.appendChild(factElement);
-            label.classList.remove('rounded-md');
-            label.classList.add('rounded-t-md');
-        } else {
-            label.classList.remove('rounded-t-md');
-            label.classList.add('rounded-md');
-        }
-      });
-      
-      if(correctCount < round.length) {
-          allCorrect = false;
-      }
-
-      totalScore += correctCount;
-      scoreBadge.textContent = totalScore;
-
-      // Show feedback in styled box
-      feedbackBox.classList.remove('hidden');
-      feedbackBox.classList.add('fade-in');
-      
-      if (allCorrect) {
-        feedbackBox.className = 'mt-4 rounded-lg px-4 py-3 text-sm font-medium bg-emerald-900/60 text-emerald-200 border border-emerald-700';
-        feedbackBox.textContent = '🎯 Perfect! All answers are correct. See the facts below!';
-        nextBtn.classList.remove('hidden');
-        checkBtn.disabled = true;
-      } else if (correctCount > 0) {
-        feedbackBox.className = 'mt-4 rounded-lg px-4 py-3 text-sm font-medium bg-cyan-900/60 text-cyan-200 border border-cyan-700';
-        feedbackBox.textContent = `You got ${correctCount} correct this round. Review and try again! (Facts for correct matches shown)`;
-        checkBtn.disabled = false;
-      } else {
-        feedbackBox.className = 'mt-4 rounded-lg px-4 py-3 text-sm font-medium bg-rose-900/60 text-rose-200 border border-rose-700';
-        feedbackBox.textContent = 'No correct matches yet — keep trying!';
-        checkBtn.disabled = false;
-      }
-    }
-
-    function nextRound() {
-      // Clear all facts/borders before moving on for a clean transition
-      puzzleArea.querySelectorAll('.state-wrapper').forEach(wrap => {
-          const factElement = wrap.querySelector('.fact-box');
-          if (factElement) wrap.removeChild(factElement);
-          const label = wrap.querySelector('.state-label');
-          label.classList.remove('rounded-t-md');
-          label.classList.add('rounded-md');
-          const input = wrap.querySelector('input[type="number"]');
-          input.classList.remove('border-green-400', 'border-red-400');
-      });
-
-
-      currentRound++;
-      if (currentRound < puzzleRounds.length) {
-        renderPuzzleRound();
-        // Short delay to hide/re-render feedback box smoothly
-        setTimeout(()=> { feedbackBox.classList.add('hidden'); }, 140); 
-      } else {
-        puzzleArea.innerHTML = `<div class="text-center py-10"><h3 class="text-3xl font-bold text-amber-400">🎉 Congratulations! You finished all rounds!</h3><p class="mt-3 text-xl text-slate-300">Your Final Score: <strong class="text-amber-300">${totalScore}</strong> / ${puzzleRounds.length * 5}</p><p class="mt-2 text-sm text-slate-400">You now know ${puzzleRounds.length * 5} new things about Indian food!</p></div>`;
-        nextBtn.classList.add('hidden');
-        checkBtn.disabled = true;
-      }
-    }
-
-    function resetPuzzle() {
-      currentRound = 0;
-      totalScore = 0;
-      scoreBadge.textContent = totalScore;
-      renderPuzzleRound();
-      feedbackBox.classList.add('hidden');
-      feedbackBox.textContent = '';
-      checkBtn.disabled = false;
-    }
-
-    // Event listeners for Puzzle
-    checkBtn.addEventListener('click', checkRound);
-    nextBtn.addEventListener('click', () => {
-      nextBtn.classList.add('hidden');
-      checkBtn.disabled = false;
-      nextRound();
-    });
-    resetBtn.addEventListener('click', resetPuzzle);
-
-    // initial render
-    renderPuzzleRound();
-
-    /* ------------------------------------------------
-     * JAVASCRIPT: STATE SPOTLIGHT QUIZ (New Multiple Choice)
-     * ------------------------------------------------ */
-
-    const stateQuizQuestions = [
-        {
-            question: "Which state is the primary origin of 'Madhubani' painting?",
-            options: ["Uttar Pradesh", "Bihar", "Odisha", "West Bengal"],
-            answer: "Bihar"
-        },
-        {
-            question: "The 'Tanjore Painting' style, known for its gold leaf work, is native to which South Indian state?",
-            options: ["Andhra Pradesh", "Kerala", "Tamil Nadu", "Karnataka"],
-            answer: "Tamil Nadu"
-        },
-        {
-            question: "Which of these crafts is closely associated with Rajasthan?",
-            options: ["Pashmina Shawls", "Blue Pottery", "Chikankari Embroidery", "Cane and Bamboo work"],
-            answer: "Blue Pottery"
-        },
-        {
-            question: "Which state is famous for its 'Rasgulla' (a soft cheese ball in syrup) and is a historical center of sweets?",
-            options: ["Assam", "West Bengal", "Maharashtra", "Gujarat"],
-            answer: "West Bengal"
-        },
-        {
-            question: "'Putharekulu', a paper-thin sweet made from rice batter, is a delicacy from which state?",
-            options: ["Telangana", "Andhra Pradesh", "Goa", "Puducherry"],
-            answer: "Andhra Pradesh"
-        },
-        {
-            question: "The traditional folk dance 'Bhangra' is strongly connected to which region?",
-            options: ["Haryana", "Punjab", "Himachal Pradesh", "Uttarakhand"],
-            answer: "Punjab"
-        },
-        {
-            question: "Which state is home to the UNESCO World Heritage site of the Hampi Monuments, known for Vijayanagara architecture?",
-            options: ["Maharashtra", "Telangana", "Karnataka", "Odisha"],
-            answer: "Karnataka"
-        },
-        {
-            question: "The intricate 'Zari' work on Banarasi sarees primarily originates from the city of Varanasi, which is in which state?",
-            options: ["Madhya Pradesh", "Rajasthan", "Uttar Pradesh", "Bihar"],
-            answer: "Uttar Pradesh"
-        },
-        {
-            question: "Which state is known for the spice 'Guntur Chilli' and is a major producer of red chillies?",
-            options: ["Andhra Pradesh", "Tamil Nadu", "Kerala", "Guntur is in a different country"],
-            answer: "Andhra Pradesh"
-        },
-        {
-            question: "The traditional 'Kalamkari' block-printed textile art often depicting mythical stories comes primarily from which region?",
-            options: ["Gujarat", "Himachal Pradesh", "Andhra Pradesh / Telangana", "West Bengal"],
-            answer: "Andhra Pradesh / Telangana"
-        }
-    ];
-
-    let currentQuizIndex = 0;
-    let userAnswers = new Array(stateQuizQuestions.length).fill(null);
-
-    const quizContainer = document.getElementById('quizContainer');
-    const nextQuestionBtn = document.getElementById('nextQuestionBtn');
-    const submitQuizBtn = document.getElementById('submitQuizBtn');
-    const restartQuizBtn = document.getElementById('restartQuizBtn');
-    const quizFeedback = document.getElementById('quizFeedback');
-    const quizScoreBadge = document.getElementById('quizScoreBadge');
-    const quizProgress = document.getElementById('quizProgress');
-
-    function updateControls() {
-        // Update progress text
-        quizProgress.textContent = `Question ${currentQuizIndex + 1} of ${stateQuizQuestions.length}. Select the correct option below.`;
+        // Global Event listeners
+        menuBtn.addEventListener('click', toggleMobileMenu);
         
-        // Handle final question state
-        if (currentQuizIndex === stateQuizQuestions.length - 1) {
-            nextQuestionBtn.classList.add('hidden');
-            submitQuizBtn.classList.remove('hidden');
-        } else {
-            nextQuestionBtn.classList.remove('hidden');
-            submitQuizBtn.classList.add('hidden');
-        }
-
-        // Disable Next button if no answer is selected for current question
-        const currentQuestionInput = quizContainer.querySelector(`input[name="question-0"]:checked`);
-        nextQuestionBtn.disabled = !currentQuestionInput;
-    }
-
-    function handleOptionClick(e) {
-        // Clear all selected styles first
-        quizContainer.querySelectorAll('.option-label').forEach(label => label.classList.remove('selected'));
-        
-        // Add selected style to the clicked label
-        e.currentTarget.classList.add('selected');
-
-        // Store the answer
-        const selectedValue = e.currentTarget.querySelector('input').value;
-        userAnswers[currentQuizIndex] = selectedValue;
-
-        // Enable the Next/Submit button
-        if (currentQuizIndex < stateQuizQuestions.length) {
-            nextQuestionBtn.disabled = false;
-        } else if (currentQuizIndex === stateQuizQuestions.length - 1) {
-            submitQuizBtn.disabled = false;
-        }
-    }
-
-    function renderSingleQuestion() {
-        quizContainer.innerHTML = ''; 
-        quizFeedback.classList.add('hidden');
-        quizFeedback.textContent = '';
-
-        if (currentQuizIndex >= stateQuizQuestions.length) {
-            showFinalScorePage();
-            return;
-        }
-
-        const q = stateQuizQuestions[currentQuizIndex];
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'bg-slate-700/80 p-5 rounded-xl shadow-lg border border-slate-600 fade-in';
-        questionDiv.innerHTML = `
-            <p class="font-semibold text-xl text-slate-100 mb-4">${q.question}</p>
-            <div class="space-y-3" data-question-index="${currentQuizIndex}">
-                ${q.options.map(option => `
-                    <label class="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border border-slate-700 hover:bg-slate-600 transition option-label">
-                        <input type="radio" name="question-0" value="${option}" class="text-amber-500 bg-slate-800 border-slate-600 focus:ring-amber-500/50">
-                        <span class="text-slate-300">${option}</span>
-                    </label>
-                `).join('')}
-            </div>
-        `;
-        quizContainer.appendChild(questionDiv);
-        
-        // Re-apply event listeners to the new radio buttons
-        quizContainer.querySelectorAll('.option-label').forEach(label => {
-            label.addEventListener('click', handleOptionClick);
+        // Close mobile menu when a link is clicked
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', toggleMobileMenu);
         });
 
-        // If the user has a saved answer, re-select it
-        if (userAnswers[currentQuizIndex]) {
-            const savedInput = quizContainer.querySelector(`input[value="${userAnswers[currentQuizIndex]}"]`);
-            if (savedInput) {
-                savedInput.checked = true;
-                savedInput.closest('.option-label').classList.add('selected');
+        startBtn.addEventListener('click', () => { 
+            window.location.href = '#puzzle';
+            if(!mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        });
+
+        /* ------------------------------------------------
+        * JAVASCRIPT: PUZZLE LOGIC (Matching Quiz - unchanged)
+        * ------------------------------------------------ */
+
+        const puzzleRounds = [
+            [
+                { food: 'Dhokla', state: 'Gujarat', fact: 'Dhokla is a steamed, spongy snack from Gujarat, often enjoyed with spicy chutneys.' },
+                { food: 'Idli', state: 'Tamil Nadu', fact: 'Idli is a soft breakfast delight from Tamil Nadu, typically made from fermented rice and lentil batter.' },
+                { food: 'Litti Chokha', state: 'Bihar', fact: 'Litti Chokha is a roasted delicacy from Bihar, where litti is baked wheat dough and chokha is a vegetable mash.' },
+                { food: 'Fish Curry', state: 'West Bengal', fact: 'Fish Curry (Machher Jhol) is a coastal favorite from West Bengal, famous for its light, flavorful mustard-based gravy.' },
+                { food: 'Rogan Josh', state: 'Jammu & Kashmir', fact: 'Rogan Josh is a spicy lamb dish from Jammu & Kashmir, one of the signature dishes of Kashmiri Wazwan cuisine.' }
+            ],
+            [
+                { food: 'Dal Baati Churma', state: 'Rajasthan', fact: 'Dal Baati Churma is a rich dish from Rajasthan. The baatis are hard, unleavened wheat balls traditionally baked in a fire.' },
+                { food: 'Poha', state: 'Madhya Pradesh', fact: 'Poha (flattened rice) is a light, healthy breakfast dish from Madhya Pradesh, often garnished with Sev and coriander.' },
+                { food: 'Biryani', state: 'Telangana', fact: 'The Hyderabad style of Biryani from Telangana is world-famous for its distinct "Kaccha Gosht" or dum cooking method.' },
+                { food: 'Sarson da Saag', state: 'Punjab', fact: 'Sarson da Saag is a winter delicacy from Punjab, made from mustard greens and best paired with Makki di Roti.' },
+                { food: 'Bamboo Shoot Curry', state: 'Nagaland', fact: 'Bamboo Shoot Curry is a tangy dish from Nagaland, central to Naga cuisine, offering a unique fermented flavor.' }
+            ],
+        ];
+
+        let currentRound = 0;
+        let totalScore = 0;
+
+        const puzzleArea = document.getElementById('puzzleArea');
+        const checkBtn = document.getElementById('checkBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const scoreBadge = document.getElementById('scoreBadge');
+        const feedbackBox = document.getElementById('feedbackBox');
+        const totalItemsBadge = document.getElementById('totalItems');
+
+        function renderPuzzleRound() {
+            const round = puzzleRounds[currentRound];
+            if (!round) {
+                puzzleArea.innerHTML = `<div class="text-center py-10"><h3 class="text-3xl font-bold text-amber-400">🎉 No more rounds!</h3><p class="mt-3 text-xl text-slate-300">Your Final Score: <strong class="text-amber-300">${totalScore}</strong> / ${puzzleRounds.length * 5}</p></div>`;
+                nextBtn.classList.add('hidden');
+                checkBtn.disabled = true;
+                return;
+            }
+            
+            puzzleArea.innerHTML = '';
+            totalItemsBadge.textContent = round.length; 
+
+            // Food Names list (Single Horizontal Row)
+            const foodList = document.createElement('div');
+            foodList.className = 'flex justify-around items-stretch gap-1 p-3 bg-slate-700 rounded-lg shadow-inner';
+            
+            round.forEach((item, idx) => {
+                const foodItem = document.createElement('div');
+                foodItem.className = 'w-1/5 flex flex-col justify-center items-center text-center px-1 py-1'; 
+                foodItem.innerHTML = `
+                    <div class="font-bold text-lg text-amber-200">${idx+1}</div>
+                    <div class="text-xs sm:text-sm text-slate-200 leading-tight">${item.food}</div>
+                `;
+                foodList.appendChild(foodItem);
+            });
+            
+            const foodHeader = document.createElement('h4');
+            foodHeader.textContent = 'Foods:';
+            foodHeader.className = 'text-lg font-medium text-slate-100 mb-2 mt-2';
+            puzzleArea.appendChild(foodHeader);
+
+            puzzleArea.appendChild(foodList);
+
+
+            // State inputs (Vertical) - Randomize the order of states for the puzzle
+            const states = round.map(i => i.state).sort(() => Math.random() - 0.5);
+            const list = document.createElement('div');
+            list.className = 'mt-4 space-y-3';
+            
+            states.forEach((state, i) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'flex flex-col state-wrapper'; 
+                
+                const label = document.createElement('label');
+                label.className = 'state-label flex items-center justify-between bg-slate-700/70 hover:bg-slate-700 px-3 py-2 rounded-md transition'; 
+                label.innerHTML = `
+                    <span class="font-medium">${state}</span>
+                    <input type="number" min="1" max="${round.length}" id="ans${i}" data-state="${state}" inputmode="numeric" aria-label="Enter number for ${state}"
+                    class="w-12 text-center rounded-md bg-slate-800/80 border border-amber-500 text-amber-300 focus:border-amber-400 px-1 py-1 transition focus:outline-none focus:ring-1 focus:ring-amber-400">
+                `;
+                wrap.appendChild(label);
+                list.appendChild(wrap);
+            });
+            puzzleArea.appendChild(list);
+
+            // reset controls states
+            nextBtn.classList.add('hidden');
+            checkBtn.disabled = false;
+
+            // clear feedback
+            feedbackBox.classList.add('hidden');
+            feedbackBox.textContent = '';
+        }
+
+        function checkRound() {
+            const round = puzzleRounds[currentRound];
+            const stateWrappers = puzzleArea.querySelectorAll('.state-wrapper'); 
+            let correctCount = 0;
+            let allCorrect = true; 
+
+            stateWrappers.forEach(wrap => {
+                // Find existing elements
+                const label = wrap.querySelector('.state-label');
+                const input = wrap.querySelector('input[type="number"]');
+                let factElement = wrap.querySelector('.fact-box');
+                
+                if (factElement) {
+                    wrap.removeChild(factElement);
+                    label.classList.remove('rounded-t-md');
+                    label.classList.add('rounded-md');
+                    factElement = null;
+                }
+
+                input.classList.remove('border-green-400', 'border-red-400', 'border-amber-500', 'border-slate-500'); 
+                const state = input.dataset.state; 
+                const ansIndex = parseInt(input.value, 10) - 1; 
+                
+                let isCorrect = false;
+                let foodItem = null; 
+
+                if (!isNaN(ansIndex) && ansIndex >= 0 && ansIndex < round.length) {
+                    const picked = round[ansIndex];
+                    if (picked && picked.state === state) {
+                        correctCount++;
+                        isCorrect = true;
+                        foodItem = picked;
+                    }
+                }
+                
+                // Add visual feedback to input boxes
+                if (input.value === "" || isNaN(ansIndex) || ansIndex < 0 || ansIndex >= round.length) {
+                    input.classList.add('border-slate-500'); 
+                    allCorrect = false;
+                } else if (isCorrect) {
+                    input.classList.add('border-green-400');
+                } else {
+                    input.classList.add('border-red-400');
+                    allCorrect = false;
+                }
+
+                if (isCorrect && foodItem && foodItem.fact) {
+                    factElement = document.createElement('div');
+                    factElement.className = 'fact-box bg-slate-600/50 text-slate-300 text-xs italic px-3 py-2 rounded-b-md -mt-1 fade-in';
+                    factElement.textContent = `💡 Fact: ${foodItem.fact}`;
+                    wrap.appendChild(factElement);
+                    label.classList.remove('rounded-md');
+                    label.classList.add('rounded-t-md');
+                } else {
+                    label.classList.remove('rounded-t-md');
+                    label.classList.add('rounded-md');
+                }
+            });
+            
+            if(correctCount < round.length) {
+                allCorrect = false;
+            }
+
+            totalScore += correctCount;
+            scoreBadge.textContent = totalScore;
+
+            // Show feedback in styled box
+            feedbackBox.classList.remove('hidden');
+            feedbackBox.classList.add('fade-in');
+            
+            if (allCorrect) {
+                feedbackBox.className = 'mt-4 rounded-lg px-4 py-3 text-sm font-medium bg-emerald-900/60 text-emerald-200 border border-emerald-700';
+                feedbackBox.textContent = '🎯 Perfect! All answers are correct. See the facts below!';
+                nextBtn.classList.remove('hidden');
+                checkBtn.disabled = true;
+            } else if (correctCount > 0) {
+                feedbackBox.className = 'mt-4 rounded-lg px-4 py-3 text-sm font-medium bg-cyan-900/60 text-cyan-200 border border-cyan-700';
+                feedbackBox.textContent = `You got ${correctCount} correct this round. Review and try again! (Facts for correct matches shown)`;
+                checkBtn.disabled = false;
+            } else {
+                feedbackBox.className = 'mt-4 rounded-lg px-4 py-3 text-sm font-medium bg-rose-900/60 text-rose-200 border border-rose-700';
+                feedbackBox.textContent = 'No correct matches yet — keep trying!';
+                checkBtn.disabled = false;
             }
         }
 
-        updateControls();
-    }
+        function nextRound() {
+            // Clear all facts/borders before moving on for a clean transition
+            puzzleArea.querySelectorAll('.state-wrapper').forEach(wrap => {
+                const factElement = wrap.querySelector('.fact-box');
+                if (factElement) wrap.removeChild(factElement);
+                const label = wrap.querySelector('.state-label');
+                label.classList.remove('rounded-t-md');
+                label.classList.add('rounded-md');
+                const input = wrap.querySelector('input[type="number"]');
+                input.classList.remove('border-green-400', 'border-red-400');
+            });
 
-    function advanceQuestion() {
-        if (currentQuizIndex < stateQuizQuestions.length - 1) {
-            currentQuizIndex++;
-            renderSingleQuestion();
-        } else if (currentQuizIndex === stateQuizQuestions.length - 1) {
-            // Last question, submit the quiz
-            submitStateQuiz();
+
+            currentRound++;
+            if (currentRound < puzzleRounds.length) {
+                renderPuzzleRound();
+                // Short delay to hide/re-render feedback box smoothly
+                setTimeout(()=> { feedbackBox.classList.add('hidden'); }, 140); 
+            } else {
+                puzzleArea.innerHTML = `<div class="text-center py-10"><h3 class="text-3xl font-bold text-amber-400">🎉 Congratulations! You finished all rounds!</h3><p class="mt-3 text-xl text-slate-300">Your Final Score: <strong class="text-amber-300">${totalScore}</strong> / ${puzzleRounds.length * 5}</p><p class="mt-2 text-sm text-slate-400">You now know ${puzzleRounds.length * 5} new things about Indian food!</p></div>`;
+                nextBtn.classList.add('hidden');
+                checkBtn.disabled = true;
+            }
         }
-    }
 
-    function showFinalScorePage() {
-        let correctCount = 0;
+        function resetPuzzle() {
+            currentRound = 0;
+            totalScore = 0;
+            scoreBadge.textContent = totalScore;
+            renderPuzzleRound();
+            feedbackBox.classList.add('hidden');
+            feedbackBox.textContent = '';
+            checkBtn.disabled = false;
+        }
 
-        const resultsHtml = stateQuizQuestions.map((q, index) => {
-            const userAnswer = userAnswers[index];
-            const isCorrect = userAnswer === q.answer;
-            if (isCorrect) correctCount++;
+        // Event listeners for Puzzle
+        checkBtn.addEventListener('click', checkRound);
+        nextBtn.addEventListener('click', () => {
+            nextBtn.classList.add('hidden');
+            checkBtn.disabled = false;
+            nextRound();
+        });
+        resetBtn.addEventListener('click', resetPuzzle);
 
-            const statusClass = isCorrect 
-                ? 'bg-emerald-900/40 border-emerald-700' 
-                : 'bg-red-900/40 border-red-700';
-            const statusIcon = isCorrect ? '✅ Correct' : '❌ Incorrect';
-            const correctAnswerDisplay = isCorrect ? '' : `<p class="text-xs mt-1 text-slate-200">The correct answer was: <strong>${q.answer}</strong></p>`;
+        // initial render
+        renderPuzzleRound();
 
-            return `
-                <div class="${statusClass} p-4 rounded-lg border mb-3 fade-in">
-                    <p class="font-medium text-slate-100">${index + 1}. ${q.question}</p>
-                    <p class="text-sm italic mt-1">${statusIcon}: You selected <strong>${userAnswer || 'No Answer'}</strong></p>
-                    ${correctAnswerDisplay}
+        /* ------------------------------------------------
+        * JAVASCRIPT: STATE SPOTLIGHT QUIZ (New Multiple Choice)
+        * ------------------------------------------------ */
+
+        const stateQuizQuestions = [
+            {
+                question: "Which state is the primary origin of 'Madhubani' painting?",
+                options: ["Uttar Pradesh", "Bihar", "Odisha", "West Bengal"],
+                answer: "Bihar"
+            },
+            {
+                question: "The 'Tanjore Painting' style, known for its gold leaf work, is native to which South Indian state?",
+                options: ["Andhra Pradesh", "Kerala", "Tamil Nadu", "Karnataka"],
+                answer: "Tamil Nadu"
+            },
+            {
+                question: "Which of these crafts is closely associated with Rajasthan?",
+                options: ["Pashmina Shawls", "Blue Pottery", "Chikankari Embroidery", "Cane and Bamboo work"],
+                answer: "Blue Pottery"
+            },
+            {
+                question: "Which state is famous for its 'Rasgulla' (a soft cheese ball in syrup) and is a historical center of sweets?",
+                options: ["Assam", "West Bengal", "Maharashtra", "Gujarat"],
+                answer: "West Bengal"
+            },
+            {
+                question: "'Putharekulu', a paper-thin sweet made from rice batter, is a delicacy from which state?",
+                options: ["Telangana", "Andhra Pradesh", "Goa", "Puducherry"],
+                answer: "Andhra Pradesh"
+            },
+            {
+                question: "The traditional folk dance 'Bhangra' is strongly connected to which region?",
+                options: ["Haryana", "Punjab", "Himachal Pradesh", "Uttarakhand"],
+                answer: "Punjab"
+            },
+            {
+                question: "Which state is home to the UNESCO World Heritage site of the Hampi Monuments, known for Vijayanagara architecture?",
+                options: ["Maharashtra", "Telangana", "Karnataka", "Odisha"],
+                answer: "Karnataka"
+            },
+            {
+                question: "The intricate 'Zari' work on Banarasi sarees primarily originates from the city of Varanasi, which is in which state?",
+                options: ["Madhya Pradesh", "Rajasthan", "Uttar Pradesh", "Bihar"],
+                answer: "Uttar Pradesh"
+            },
+            {
+                question: "Which state is known for the spice 'Guntur Chilli' and is a major producer of red chillies?",
+                options: ["Andhra Pradesh", "Tamil Nadu", "Kerala", "Guntur is in a different country"],
+                answer: "Andhra Pradesh"
+            },
+            {
+                question: "The traditional 'Kalamkari' block-printed textile art often depicting mythical stories comes primarily from which region?",
+                options: ["Gujarat", "Himachal Pradesh", "Andhra Pradesh / Telangana", "West Bengal"],
+                answer: "Andhra Pradesh / Telangana"
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let userAnswers = new Array(stateQuizQuestions.length).fill(null);
+
+        const quizContainer = document.getElementById('quizContainer');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const submitQuizBtn = document.getElementById('submitQuizBtn');
+        const restartQuizBtn = document.getElementById('restartQuizBtn');
+        const quizFeedback = document.getElementById('quizFeedback');
+        const quizScoreBadge = document.getElementById('quizScoreBadge');
+        const quizProgress = document.getElementById('quizProgress');
+
+        function updateControls() {
+            // Update progress text
+            quizProgress.textContent = `Question ${currentQuizIndex + 1} of ${stateQuizQuestions.length}. Select the correct option below.`;
+            
+            // Handle final question state
+            if (currentQuizIndex === stateQuizQuestions.length - 1) {
+                nextQuestionBtn.classList.add('hidden');
+                submitQuizBtn.classList.remove('hidden');
+            } else {
+                nextQuestionBtn.classList.remove('hidden');
+                submitQuizBtn.classList.add('hidden');
+            }
+
+            // Disable Next button if no answer is selected for current question
+            const currentQuestionInput = quizContainer.querySelector(`input[name="question-0"]:checked`);
+            nextQuestionBtn.disabled = !currentQuestionInput;
+        }
+
+        function handleOptionClick(e) {
+            // Clear all selected styles first
+            quizContainer.querySelectorAll('.option-label').forEach(label => label.classList.remove('selected'));
+
+            if (e.target.tagName === 'INPUT') {
+                const label = e.target.closest('label');
+                label.classList.add('selected');
+
+                // Save answer and update controls state
+                const selectedOption = e.target.value;
+                userAnswers[currentQuizIndex] = selectedOption;
+                updateControls();
+            }
+        }
+
+        function renderQuizQuestion() {
+            const qData = stateQuizQuestions[currentQuizIndex];
+            if (!qData) return;
+
+            quizContainer.innerHTML = `
+                <h4 class="text-xl font-semibold mb-4 text-amber-200">${qData.question}</h4>
+                <div class="space-y-3" role="radiogroup" aria-labelledby="question-${currentQuizIndex}">
+                    ${qData.options.map((option, index) => `
+                        <label class="option-label flex items-center bg-slate-700/70 hover:bg-slate-700 px-4 py-3 rounded-lg transition border border-transparent">
+                            <input type="radio" name="question-0" value="${option}" class="w-4 h-4 text-amber-500 bg-slate-800 border-slate-600 focus:ring-amber-500"
+                                ${userAnswers[currentQuizIndex] === option ? 'checked' : ''} disabled>
+                            <span class="ml-3 font-medium text-slate-200">${option}</span>
+                        </label>
+                    `).join('')}
                 </div>
             `;
-        }).join('');
+            
+            // Re-apply selected state and enable inputs
+            quizContainer.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.disabled = false;
+                if (input.checked) {
+                    input.closest('label').classList.add('selected');
+                }
+            });
 
-        quizContainer.innerHTML = `
-            <div class="text-center py-8 fade-in">
-                <h4 class="text-3xl font-bold text-amber-400">Quiz Complete!</h4>
-                <p class="text-xl text-slate-200 mt-2">Your Final Score:</p>
-                <p class="text-5xl font-extrabold text-green-400 my-4">${correctCount} / ${stateQuizQuestions.length}</p>
-                <p class="text-lg text-slate-300">Review your answers below:</p>
-            </div>
-            <div class="mt-6">
-                ${resultsHtml}
-            </div>
-        `;
-
-        quizScoreBadge.textContent = `${correctCount} / ${stateQuizQuestions.length}`;
-        quizProgress.textContent = `Quiz Finished. Scroll down to review.`;
-
-        // Hide navigation buttons and show only restart
-        nextQuestionBtn.classList.add('hidden');
-        submitQuizBtn.classList.add('hidden');
-    }
-
-    function submitStateQuiz() {
-        // This function is only called when on the last question
-        showFinalScorePage();
-    }
-    
-    function restartStateQuiz() {
-        currentQuizIndex = 0;
-        userAnswers.fill(null);
-        quizScoreBadge.textContent = `0 / ${stateQuizQuestions.length}`;
-        renderSingleQuestion();
-    }
-
-    nextQuestionBtn.addEventListener('click', advanceQuestion);
-    submitQuizBtn.addEventListener('click', submitStateQuiz);
-    restartQuizBtn.addEventListener('click', restartStateQuiz);
-
-    // Initial render of the new quiz
-    renderSingleQuestion();
-
-
-    /* ------------------------------------------------
-     * JAVASCRIPT: TRIVIA LOGIC (Group Quiz - unchanged)
-     * ------------------------------------------------ */
-
-    const triviaQuestions = [
-        {
-            question: "Which Indian city is famous for its 'Blue Pottery' art form?",
-            answer: "Jaipur (Rajasthan)",
-            category: "Crafts"
-        },
-        {
-            question: "The traditional sweet 'Sandesh' is a delicacy primarily from which state?",
-            answer: "West Bengal",
-            category: "Food"
-        },
-        {
-            question: "Warli painting is a form of tribal art practiced mainly by the Adivasis of which state?",
-            answer: "Maharashtra",
-            category: "Heritage"
-        },
-        {
-            question: "Which spice is known as 'Red Gold' and is primarily cultivated in Jammu & Kashmir (Kashmir Valley)?",
-            answer: "Saffron (Kesar)",
-            category: "Food"
-        },
-        {
-            question: "The classical dance form 'Kathakali' originated in which Southern Indian state?",
-            answer: "Kerala",
-            category: "Heritage"
-        },
-        {
-            question: "What material is traditionally used to make 'Bidriware' crafts, famous in Bidar?",
-            answer: "Zinc alloy (darkened with soil/salts)",
-            category: "Crafts"
-        },
-        {
-            question: "Which flatbread, typically eaten with Sarson da Saag, is made from maize flour?",
-            answer: "Makki di Roti",
-            category: "Food"
-        },
-        {
-            question: "What is the name of the ancient martial art form originating in Kerala, known for its focus on physical training and weapons?",
-            answer: "Kalaripayattu",
-            category: "Heritage"
-        },
-    ];
-
-    let currentQuestionIndex = -1;
-    let triviaScores = { A: 0, B: 0, C: 0, D: 0 };
-
-    const newQuestionBtn = document.getElementById('newQuestionBtn');
-    const showAnswerBtn = document.getElementById('showAnswerBtn');
-    const resetTriviaBtn = document.getElementById('resetTriviaBtn');
-    const questionText = document.getElementById('triviaQuestionText');
-    const answerBox = document.getElementById('triviaAnswerBox');
-    const answerSpan = document.getElementById('triviaAnswer');
-    const scoreElements = {
-        A: document.getElementById('scoreA'),
-        B: document.getElementById('scoreB'),
-        C: document.getElementById('scoreC'),
-        D: document.getElementById('scoreD')
-    };
-    
-    // Utility to get a random question without immediate repeats
-    function getRandomQuestionIndex() {
-        let newIndex;
-        if (triviaQuestions.length > 1) {
-            do {
-                newIndex = Math.floor(Math.random() * triviaQuestions.length);
-            } while (newIndex === currentQuestionIndex);
-        } else {
-            newIndex = 0; 
+            // Hide feedback and update control buttons
+            quizFeedback.classList.add('hidden');
+            updateControls();
         }
-        return newIndex;
-    }
 
-    function renderNewQuestion() {
-        currentQuestionIndex = getRandomQuestionIndex();
-        const q = triviaQuestions[currentQuestionIndex];
-
-        questionText.textContent = q.question;
-        answerSpan.textContent = q.answer;
-
-        answerBox.classList.add('hidden');
-        showAnswerBtn.classList.remove('hidden');
-        newQuestionBtn.disabled = true;
-        
-        document.querySelectorAll('.score-btn').forEach(btn => btn.classList.add('hidden'));
-    }
-
-    function showAnswer() {
-        answerBox.classList.remove('hidden');
-        showAnswerBtn.classList.add('hidden');
-        newQuestionBtn.disabled = false; 
-
-        document.querySelectorAll('.score-btn').forEach(btn => btn.classList.remove('hidden'));
-    }
-
-    function updateScore(group, points) {
-        triviaScores[group] += points;
-        scoreElements[group].textContent = triviaScores[group];
-        
-        if (triviaScores[group] < 0) {
-            scoreElements[group].classList.remove('text-green-400', 'text-slate-300');
-            scoreElements[group].classList.add('text-red-400');
-        } else if (triviaScores[group] > 0) {
-            scoreElements[group].classList.remove('text-red-400', 'text-slate-300');
-            scoreElements[group].classList.add('text-green-400');
-        } else {
-            scoreElements[group].classList.remove('text-red-400', 'text-green-400');
-            scoreElements[group].classList.add('text-slate-300');
+        function goToNextQuestion() {
+            if (currentQuizIndex < stateQuizQuestions.length - 1) {
+                currentQuizIndex++;
+                renderQuizQuestion();
+            }
         }
-    }
 
-    function resetTrivia() {
-        triviaScores = { A: 0, B: 0, C: 0, D: 0 };
-        for (const group in scoreElements) {
-            scoreElements[group].textContent = '0';
-            scoreElements[group].classList.remove('text-red-400', 'text-green-400');
-            scoreElements[group].classList.add('text-slate-300');
+        function submitQuiz() {
+            let correctCount = 0;
+            const totalQuestions = stateQuizQuestions.length;
+
+            stateQuizQuestions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                if (userAnswer === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            // Update Score Badge
+            quizScoreBadge.textContent = `${correctCount} / ${totalQuestions}`;
+
+            // Show Final Feedback
+            quizFeedback.classList.remove('hidden');
+            quizFeedback.classList.add('fade-in');
+            
+            if (correctCount === totalQuestions) {
+                quizFeedback.className = 'mt-6 rounded-lg px-4 py-3 text-sm font-medium bg-emerald-900/60 text-emerald-200 border border-emerald-700';
+                quizFeedback.innerHTML = `🎉 **Amazing!** You got all ${totalQuestions} questions correct! You are a Heritage Champion!`;
+            } else if (correctCount >= totalQuestions * 0.7) {
+                quizFeedback.className = 'mt-6 rounded-lg px-4 py-3 text-sm font-medium bg-cyan-900/60 text-cyan-200 border border-cyan-700';
+                quizFeedback.innerHTML = `Great effort! You scored **${correctCount}** out of ${totalQuestions}. You clearly know a lot about India!`;
+            } else {
+                quizFeedback.className = 'mt-6 rounded-lg px-4 py-3 text-sm font-medium bg-rose-900/60 text-rose-200 border border-rose-700';
+                quizFeedback.innerHTML = `You scored **${correctCount}** out of ${totalQuestions}. Keep exploring India's heritage and try again!`;
+            }
+
+            // Disable all inputs after submission
+            quizContainer.querySelectorAll('input[type="radio"]').forEach(input => input.disabled = true);
+            
+            // Hide submit button and next button
+            submitQuizBtn.classList.add('hidden');
+            nextQuestionBtn.classList.add('hidden');
+
+            // Update progress text
+            quizProgress.textContent = "Quiz finished!";
         }
-        questionText.textContent = "Press 'New Question' to begin the trivia challenge.";
-        answerBox.classList.add('hidden');
-        showAnswerBtn.classList.add('hidden');
-        newQuestionBtn.disabled = false;
-        currentQuestionIndex = -1;
-        
-        document.querySelectorAll('.score-btn').forEach(btn => btn.classList.add('hidden'));
-    }
 
-    // Event listeners for Trivia
-    newQuestionBtn.addEventListener('click', renderNewQuestion);
-    showAnswerBtn.addEventListener('click', showAnswer);
-    resetTriviaBtn.addEventListener('click', resetTrivia);
-    
-    // Listener for all score buttons
-    document.querySelectorAll('.score-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const group = e.target.dataset.group;
-            const points = parseInt(e.target.dataset.points);
-            updateScore(group, points);
+        function restartQuiz() {
+            currentQuizIndex = 0;
+            userAnswers.fill(null);
+            quizScoreBadge.textContent = "0 / 10";
+            renderQuizQuestion();
+            quizFeedback.classList.add('hidden');
+            submitQuizBtn.classList.add('hidden');
+            nextQuestionBtn.classList.remove('hidden');
+        }
+
+        // Quiz Event Listeners
+        quizContainer.addEventListener('click', handleOptionClick);
+        nextQuestionBtn.addEventListener('click', goToNextQuestion);
+        submitQuizBtn.addEventListener('click', submitQuiz);
+        restartQuizBtn.addEventListener('click', restartQuiz);
+
+        // Initial quiz load
+        renderQuizQuestion();
+
+        /* ------------------------------------------------
+        * JAVASCRIPT: TRIVIA LOGIC (Scoreboard - unchanged)
+        * ------------------------------------------------ */
+
+        const triviaQuestions = [
+            { q: "The famous Konark Sun Temple is located in which state?", a: "Odisha" },
+            { q: "What is the name of the art form using rice paste for drawings, primarily from Tamil Nadu?", a: "Kolam" },
+            { q: "Which Indian city is known as the 'Diamond City of India' due to its diamond cutting and polishing industry?", a: "Surat (Gujarat)" },
+            { q: "The traditional folk music 'Lavani' is primarily associated with which state?", a: "Maharashtra" },
+            { q: "Which type of mango, famous for its sweet aroma and high cost, is cultivated mainly in the Konkan region of Maharashtra?", a: "Alphonso (Hapus)" }
+        ];
+
+        let currentTriviaIndex = 0;
+        const scores = { A: 0, B: 0, C: 0, D: 0 };
+
+        const triviaQuestionText = document.getElementById('triviaQuestionText');
+        const triviaAnswer = document.getElementById('triviaAnswer');
+        const triviaAnswerBox = document.getElementById('triviaAnswerBox');
+        const newQuestionBtn = document.getElementById('newQuestionBtn');
+        const showAnswerBtn = document.getElementById('showAnswerBtn');
+        const resetTriviaBtn = document.getElementById('resetTriviaBtn');
+        const scoreBtns = document.querySelectorAll('.score-btn');
+        const scoreBadges = {
+            A: document.getElementById('scoreA'),
+            B: document.getElementById('scoreB'),
+            C: document.getElementById('scoreC'),
+            D: document.getElementById('scoreD'),
+        };
+
+        function displayQuestion() {
+            if (currentTriviaIndex < triviaQuestions.length) {
+                const qData = triviaQuestions[currentTriviaIndex];
+                triviaQuestionText.textContent = qData.q;
+                triviaAnswer.textContent = qData.a;
+                triviaAnswerBox.classList.add('hidden');
+                showAnswerBtn.classList.remove('hidden');
+                scoreBtns.forEach(btn => btn.classList.remove('hidden'));
+                currentTriviaIndex++;
+            } else {
+                triviaQuestionText.textContent = "All questions completed! Click 'Reset Scores' to play a new game.";
+                triviaAnswer.textContent = "";
+                triviaAnswerBox.classList.add('hidden');
+                showAnswerBtn.classList.add('hidden');
+                scoreBtns.forEach(btn => btn.classList.add('hidden'));
+            }
+        }
+
+        function toggleAnswer() {
+            triviaAnswerBox.classList.toggle('hidden');
+            showAnswerBtn.classList.add('hidden');
+        }
+
+        function updateScore(group, points) {
+            scores[group] += points;
+            scoreBadges[group].textContent = scores[group];
+            
+            // Animate score change (optional, but nice)
+            const badge = scoreBadges[group];
+            badge.classList.add('text-4xl', 'transition', 'duration-100', 'text-amber-500');
+            setTimeout(() => {
+                badge.classList.remove('text-4xl', 'text-amber-500');
+            }, 100);
+        }
+
+        function resetTrivia() {
+            currentTriviaIndex = 0;
+            scores.A = scores.B = scores.C = scores.D = 0;
+            scoreBadges.A.textContent = scoreBadges.B.textContent = scoreBadges.C.textContent = scoreBadges.D.textContent = 0;
+            triviaQuestionText.textContent = "Press 'New Question' to begin the trivia challenge.";
+            triviaAnswerBox.classList.add('hidden');
+            showAnswerBtn.classList.add('hidden');
+            scoreBtns.forEach(btn => btn.classList.add('hidden'));
+        }
+
+        // Trivia Event Listeners
+        newQuestionBtn.addEventListener('click', displayQuestion);
+        showAnswerBtn.addEventListener('click', toggleAnswer);
+        resetTriviaBtn.addEventListener('click', resetTrivia);
+        scoreBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const group = btn.dataset.group;
+                const points = parseInt(btn.dataset.points, 10);
+                updateScore(group, points);
+            });
         });
-    });
 
-    /* ------------------------------------------------
-     * JAVASCRIPT: LEAFLET MAP (unchanged)
-     * ------------------------------------------------ */
+        /* ------------------------------------------------
+        * JAVASCRIPT: MAP LOGIC (Leaflet Map - unchanged)
+        * ------------------------------------------------ */
 
-    const indiaBounds = [
-      [6.5, 68.0],
-      [37.5, 97.5]
-    ];
+        // Check if map element exists before initializing
+        const mapElement = document.getElementById('indiaMap');
+        if (mapElement) {
+            // Initialize the map, centered roughly over India
+            const map = L.map('indiaMap').setView([22.5, 78.5], 4.5);
 
-    const map = L.map('indiaMap', {
-      center: [22.9734, 78.6569],
-      zoom: 5,
-      minZoom: 4,
-      maxZoom: 8,
-      maxBounds: indiaBounds,
-      maxBoundsViscosity: 1.0,
-      attributionControl: true
-    });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 10,
-      minZoom: 4,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+            // Sample Marker Data (State, Lat, Lng, Craft/Food)
+            const markersData = [
+                { lat: 21.1702, lng: 72.8311, info: "Surat, Gujarat: Diamond Hub" },
+                { lat: 18.5204, lng: 73.8567, info: "Pune, Maharashtra: Kolhapuri Chappal" },
+                { lat: 25.3176, lng: 82.9739, info: "Varanasi, UP: Banarasi Sarees" },
+                { lat: 26.9124, lng: 75.7873, info: "Jaipur, Rajasthan: Blue Pottery" },
+                { lat: 12.9716, lng: 77.5946, info: "Bangalore, Karnataka: Channapatna Toys (near)" },
+                { lat: 25.5941, lng: 85.1376, info: "Patna, Bihar: Madhubani Art (near)" },
+                { lat: 22.5726, lng: 88.3639, info: "Kolkata, West Bengal: Rosogolla / Terracotta" }
+            ];
 
-    const statesData = [
-      { name: "Maharashtra", coords: [19.7515, 75.7139], info: "Kolhapuri Chappals & Warli Art" },
-      { name: "Uttar Pradesh", coords: [26.8467, 80.9462], info: "Banarasi Sarees & Brass Work" },
-      { name: "Karnataka", coords: [15.3173, 75.7139], info: "Channapatna Toys & Sandalwood Crafts" },
-      { name: "Bihar", coords: [25.0961, 85.3131], info: "Madhubani Paintings" },
-      { name: "Rajasthan", coords: [27.0238, 74.2179], info: "Blue Pottery & Block Printing" },
-      { name: "Tamil Nadu", coords: [11.1271, 78.6569], info: "Tanjore Paintings & Silk Sarees" }
-    ];
-
-    statesData.forEach(state => {
-      const marker = L.marker(state.coords).addTo(map);
-      marker.bindPopup(`<strong>${state.name}</strong><br>${state.info}`);
-      L.circle(state.coords, {
-        color: '#f59e0b',
-        fillColor: '#fbbf24',
-        fillOpacity: 0.18,
-        radius: 35000
-      }).addTo(map);
-    });
-
-    document.getElementById('indiaMap').setAttribute('tabindex', '0');
-
-  </script>
+            // Add Markers to the map
+            markersData.forEach(data => {
+                L.marker([data.lat, data.lng])
+                    .addTo(map)
+                    .bindPopup(`<b>${data.info}</b>`);
+            });
+        }
+    </script>
 
 </body>
 </html>
